@@ -1,7 +1,7 @@
 namespace App
 
+open Fable.Core
 open Feliz
-open Feliz.Router
 open Feliz.UseElmish
 open Elmish
 
@@ -15,17 +15,18 @@ type Article = {
 
 [<RequireQualifiedAccess>]
 module Article =
-    let createDummies () = [
+    let createDummies () : Article array= [|
         { Id = 1; Title = "Article About Cars"; Body = "Cars can move you around." }
         { Id = 2; Title = "Article About Guns"; Body = "Guns can remove you." }
         { Id = 3; Title = "Article About Drugs"; Body = "Drugs can move with you." }
-    ] 
+    |] 
+
 
 [<RequireQualifiedAccess>]
 module Menu =
     type State = {
         SelectedArticleId : int option
-        Articles: Article list
+        Articles: Article array
     }
     
     type Msg =
@@ -35,29 +36,34 @@ module Menu =
     let init articles =
         {
             SelectedArticleId = None
-            Articles = []
+            Articles = [||]
         },
         Cmd.none
     
     let update msg state =
         match msg with
-        | SelectArticle articleId -> { state with SelectedArticleId = Some articleId }, Cmd.none
-        | DeselectArticle -> { state with SelectedArticleId = None }, Cmd.none
+        | SelectArticle articleId ->
+            { state with SelectedArticleId = Some articleId }, Cmd.none
+            
+        | DeselectArticle ->
+            { state with SelectedArticleId = None }, Cmd.none
     
-    let private displayArticleName (article: Article) =
-        Html.p [
-            prop.text article.Title
-        ]
-    
-    let Render articles =
+    [<ReactComponent>]
+    let displayArticleName (article: Article) =
+        Html.p [ prop.text article.Title ]
+
+    [<ReactComponent>]    
+    let Render (articles: Article array) =
         let state, dispatch = React.useElmish(articles |> init, update, [| |])
+        // let articles, setArticles = React.useState(articles)
         
         Html.div [
             prop.classes [ "menu" ]
             prop.children [
                 Html.h1 "Menu"
-                state.Articles
-                |> List.map displayArticleName
+                
+                articles
+                |> Array.map displayArticleName
                 |> React.fragment
             ]
         ]
@@ -65,7 +71,8 @@ module Menu =
         
 [<RequireQualifiedAccess>]
 module Content =
-    let Render() =
+    [<ReactComponent>]
+    let Render () =
         Html.div [
             prop.classes [ "content" ]
             prop.children [
@@ -78,11 +85,12 @@ module Content =
 module Application =
     type State = {
         SelectedArticleId : int
-        Articles: Article list
+        Articles: Article array
     }
     
-    let Render() =
-        let articles, setArticles = Article.createDummies() |> React.useState 
+    [<ReactComponent>]
+    let Render () =
+        let (articles, setState) = React.useState(Article.createDummies())
         
         Html.div [
             prop.classes [ "application" ]
@@ -91,24 +99,3 @@ module Application =
                 Content.Render ()
             ]
         ]
-        
-
-// [<RequireQualifiedAccess>]
-// module Router =
-//     /// <summary>
-//     /// A React component that uses Feliz.Router
-//     /// to determine what to show based on the current URL
-//     /// </summary>
-//     [<ReactComponent>]
-//     let Apply() =
-//         let (currentUrl, updateUrl) = React.useState(Router.currentUrl())
-//         React.router [
-//             router.onUrlChanged updateUrl
-//             router.children [
-//                 match currentUrl with
-//                 | [ ] -> Application.Render()
-//                 // | [ "hello" ] -> Components.HelloWorld()
-//                 // | [ "counter" ] -> Components.Counter()
-//                 | otherwise -> Html.h1 "Not found"
-//             ]
-//         ]
