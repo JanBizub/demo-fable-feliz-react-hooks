@@ -7,6 +7,7 @@ open Fable.Core.JsInterop
 
 importSideEffects "./styles/global.scss"
 
+// todo: what is the difference between ReactDOM.createRoot and RectDOM.render
 ReactDOM.createRoot(document.getElementById "feliz-app")
-|> fun reactRoot -> Components.HelloWorld()
+|> fun reactRoot -> Application.Render()
                     |> reactRoot.render 
