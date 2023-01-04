@@ -22,6 +22,8 @@ module Article =
     |] 
 
 
+// https://beta.reactjs.org/learn/managing-state
+
 [<RequireQualifiedAccess>]
 module Menu =
     type State = {
