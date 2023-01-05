@@ -34,7 +34,7 @@ module Menu =
     type MenuState = ArticleState
     
     [<ReactComponent>]    
-    let Render (state: MenuState, onArticleSelect) =
+    let Render (state: MenuState, onArticleSelect, onArticleCreate) =
         // let articles, setArticles = React.useState(articles)
         
         let displayArticleName (article: Article) =
@@ -64,7 +64,7 @@ module Content =
     type ContentState = ArticleState
     
     [<ReactComponent>]
-    let Render (state: ContentState, onArticleSelect) =
+    let Render (state: ContentState, onArticleSelect, onArticleCreate) =
         // let articles, setArticles = React.useState(articles)
 
         let displayArticleName (article: Article) =
@@ -76,11 +76,18 @@ module Content =
                 prop.text article.Title
                 prop.onClick (fun _ -> article.Id |> onArticleSelect)
             ]
+            
+        let addArtcleButton = Html.button [
+            prop.text "Add Article"
+            prop.onClick (fun _ -> onArticleCreate())
+        ]
         
         Html.div [
             prop.classes [ "content" ]
             prop.children [
                 Html.h1 "Content"
+                
+                addArtcleButton
                 
                 state.Articles
                 |> Array.map displayArticleName
@@ -98,7 +105,7 @@ module Application =
     type Msg =
         | SelectArticle of ArticleId
         | DeselectArticle
-        // | AddArticle
+        | AddArticle
     
     let init articles =
         {
@@ -116,29 +123,31 @@ module Application =
             { state with ArticleState = { state.ArticleState with SelectedArticleId = None } },
             Cmd.none
             
-        // | AddArticle ->
-        //     let id =
-        //         state.ArticleState.Articles
-        //         |> Array.map ( fun article -> article.Id)
-        //         |> Array.max
-        //         |> fun max -> max + 1
-        //     
-        //     let newArticle = { Id = id; Title = "Added article"; Body = "Added article" }
-        //     
-        //     { state with ArticleState =  { state.ArticleState with SelectedArticleId = None } },
-        //     Cmd.none
+        | AddArticle ->
+            let id =
+                state.ArticleState.Articles
+                |> Array.map ( fun article -> article.Id)
+                |> Array.max
+                |> fun max -> max + 1
+            
+            let newArticle = { Id = id; Title = "Added article"; Body = "Added article" }
+            
+            { state with
+               ArticleState = { state.ArticleState
+                                with Articles = state.ArticleState.Articles |> Array.append [| newArticle |] } },
+            Cmd.none
     
     [<ReactComponent>]
     let Render () =
         let (state, dispatch) = React.useElmish(Article.createDummies() |> init, update , [|  |])
         let onArticleSelect articleId = articleId |> SelectArticle |> dispatch
-        // let onArticleCreate = AddArticle |> dispatch
+        let onArticleCreate () = AddArticle |> dispatch
         
         Html.div [
             prop.classes [ "application" ]
             prop.children [
                 Html.p [ prop.text $"Selected article id: {state.ArticleState.SelectedArticleId}" ]
-                Menu.Render (state.ArticleState, onArticleSelect)
-                Content.Render (state.ArticleState, onArticleSelect)
+                Menu.Render (state.ArticleState, onArticleSelect, onArticleCreate)
+                Content.Render (state.ArticleState, onArticleSelect, onArticleCreate)
             ]
         ]
