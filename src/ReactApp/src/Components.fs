@@ -1,9 +1,12 @@
 namespace App
 
+open System
 open Fable.Core
 open Feliz
 open Feliz.UseElmish
 open Elmish
+
+// https://beta.reactjs.org/learn/managing-state
 
 type ArticleId = int
 
@@ -13,46 +16,25 @@ type Article = {
     Body  : string
     }
 
+type ArticleState = {
+    SelectedArticleId : int option
+    Articles: Article array
+    }
+
 [<RequireQualifiedAccess>]
 module Article =
     let createDummies () : Article array= [|
         { Id = 1; Title = "Article About Cars"; Body = "Cars can move you around." }
         { Id = 2; Title = "Article About Guns"; Body = "Guns can remove you." }
         { Id = 3; Title = "Article About Drugs"; Body = "Drugs can move with you." }
-    |] 
-
-
-// https://beta.reactjs.org/learn/managing-state
+    |]
 
 [<RequireQualifiedAccess>]
 module Menu =
-    type State = {
-        SelectedArticleId : int option
-        Articles: Article array
-    }
-    
-    type Msg =
-        | SelectArticle of ArticleId
-        | DeselectArticle
-    
-    let init articles =
-        {
-            SelectedArticleId = None
-            Articles = [||]
-        },
-        Cmd.none
-    
-    let update msg state =
-        match msg with
-        | SelectArticle articleId ->
-            { state with SelectedArticleId = Some articleId }, Cmd.none
-            
-        | DeselectArticle ->
-            { state with SelectedArticleId = None }, Cmd.none
+    type MenuState = ArticleState
     
     [<ReactComponent>]    
-    let Render (articles: Article array) =
-        let state, dispatch = React.useElmish(articles |> init, update, [| |])
+    let Render (state: MenuState, onArticleSelect) =
         // let articles, setArticles = React.useState(articles)
         
         let displayArticleName (article: Article) =
@@ -62,7 +44,7 @@ module Menu =
                                    if selectedArticleId = article.Id then "selected" else "")
                                |> Option.defaultValue "" ]
                 prop.text article.Title
-                prop.onClick (fun _ -> article.Id |> SelectArticle |> dispatch)
+                prop.onClick (fun _ -> article.Id |> onArticleSelect)
             ]
         
         Html.div [
@@ -70,7 +52,7 @@ module Menu =
             prop.children [
                 Html.h1 "Menu"
                 
-                articles
+                state.Articles
                 |> Array.map displayArticleName
                 |> React.fragment
             ]
@@ -79,34 +61,11 @@ module Menu =
         
 [<RequireQualifiedAccess>]
 module Content =
-    type State = {
-        SelectedArticleId : int option
-        Articles: Article array
-    }
-    
-    type Msg =
-        | SelectArticle of ArticleId
-        | DeselectArticle
-    
-    let init articles =
-        {
-            SelectedArticleId = None
-            Articles = [||]
-        },
-        Cmd.none
-    
-    let update msg state =
-        match msg with
-        | SelectArticle articleId ->
-            { state with SelectedArticleId = Some articleId }, Cmd.none
-            
-        | DeselectArticle ->
-            { state with SelectedArticleId = None }, Cmd.none
-    
+    type ContentState = ArticleState
     
     [<ReactComponent>]
-    let Render (articles: Article array) =
-        let state, dispatch = React.useElmish(articles |> init, update, [| |])
+    let Render (state: ContentState, onArticleSelect) =
+        // let articles, setArticles = React.useState(articles)
 
         let displayArticleName (article: Article) =
             Html.p [
@@ -115,7 +74,7 @@ module Content =
                                    if selectedArticleId = article.Id then "selected" else "")
                                |> Option.defaultValue "" ]
                 prop.text article.Title
-                prop.onClick (fun _ -> article.Id |> SelectArticle |> dispatch)
+                prop.onClick (fun _ -> article.Id |> onArticleSelect)
             ]
         
         Html.div [
@@ -123,7 +82,7 @@ module Content =
             prop.children [
                 Html.h1 "Content"
                 
-                articles
+                state.Articles
                 |> Array.map displayArticleName
                 |> React.fragment
             ]
@@ -132,38 +91,54 @@ module Content =
         
 [<RequireQualifiedAccess>]
 module Application =
-    type State = {
-        SelectedArticleId : int option
-        Articles: Article array
+    type ApplicationState = {
+        ArticleState: ArticleState
     }
     
     type Msg =
         | SelectArticle of ArticleId
         | DeselectArticle
+        // | AddArticle
     
     let init articles =
         {
-            SelectedArticleId = None
-            Articles = [||]
+            ArticleState = { Articles = articles; SelectedArticleId = None }
         },
         Cmd.none
     
-    let update msg state =
+    let update msg (state: ApplicationState) =
         match msg with
         | SelectArticle articleId ->
-            { state with SelectedArticleId = Some articleId }, Cmd.none
+            { state with ArticleState = { state.ArticleState with SelectedArticleId = Some articleId } },
+            Cmd.none
             
         | DeselectArticle ->
-            { state with SelectedArticleId = None }, Cmd.none
+            { state with ArticleState = { state.ArticleState with SelectedArticleId = None } },
+            Cmd.none
+            
+        // | AddArticle ->
+        //     let id =
+        //         state.ArticleState.Articles
+        //         |> Array.map ( fun article -> article.Id)
+        //         |> Array.max
+        //         |> fun max -> max + 1
+        //     
+        //     let newArticle = { Id = id; Title = "Added article"; Body = "Added article" }
+        //     
+        //     { state with ArticleState =  { state.ArticleState with SelectedArticleId = None } },
+        //     Cmd.none
     
     [<ReactComponent>]
     let Render () =
-        let (articles, setState) = React.useState(Article.createDummies())
+        let (state, dispatch) = React.useElmish(Article.createDummies() |> init, update , [|  |])
+        let onArticleSelect articleId = articleId |> SelectArticle |> dispatch
+        // let onArticleCreate = AddArticle |> dispatch
         
         Html.div [
             prop.classes [ "application" ]
             prop.children [
-                Menu.Render articles
-                Content.Render articles
+                Html.p [ prop.text $"Selected article id: {state.ArticleState.SelectedArticleId}" ]
+                Menu.Render (state.ArticleState, onArticleSelect)
+                Content.Render (state.ArticleState, onArticleSelect)
             ]
         ]
