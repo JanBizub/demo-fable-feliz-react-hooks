@@ -25,7 +25,8 @@ module Article =
         { Id = 3; Title = "Article About Drugs"; Body = "Drugs can move with you." }
     |]
     
-    let addDummyArticle articleId = { Id = articleId; Title = "Article About Gardening"; Body = "Gardening is about gardening." }
+    let addDummyArticle articleId =
+        { Id = articleId; Title = "Article About Gardening"; Body = "Gardening is about gardening." }
 
 [<RequireQualifiedAccess>]
 module Menu =
@@ -37,15 +38,16 @@ module Menu =
         
         let displayArticleName (article: Article) =
             Html.p [
-                prop.classes [ state.SelectedArticleId
-                               |> Option.map (fun selectedArticleId ->
-                                   if selectedArticleId = article.Id then "selected" else "")
-                               |> Option.defaultValue "" ]
+                prop.classes [
+                    state.SelectedArticleId
+                    |> Option.map (fun selectedArticleId -> if selectedArticleId = article.Id then "selected" else "")
+                    |> Option.defaultValue ""
+                ]
                 prop.text article.Title
                 prop.onClick (fun _ -> article.Id |> onArticleSelect)
             ]
             
-        let addArtcleButton = Html.button [
+        let btnAddArticle = Html.button [
             prop.text "Add Article"
             prop.onClick (fun _ -> onAddArticle())
         ]
@@ -54,9 +56,7 @@ module Menu =
             prop.classes [ "menu" ]
             prop.children [
                 Html.h1 "Menu"
-                
-                addArtcleButton
-                
+                btnAddArticle
                 state.Articles
                 |> Array.map displayArticleName
                 |> React.fragment
@@ -72,7 +72,8 @@ module Content =
     let Render (state: ContentState, onArticleSelect, onAddArticle) =
         // let articles, setArticles = React.useState(articles)
 
-        let displayArticleName (article: Article) = React.fragment [
+        let displayArticleName (article: Article) =
+            React.fragment [
                 Html.h4 [
                     prop.classes [
                         state.SelectedArticleId
@@ -89,16 +90,18 @@ module Content =
             ]
             
             
-        let addArtcleButton = Html.button [
-            prop.text "Add Article"
-            prop.onClick (fun _ -> onAddArticle())
-        ]
+        let btnAddArticle =
+            Html.button [
+                prop.text "Add Article"
+                prop.onClick (fun _ -> onAddArticle())
+            ]
+        
         
         Html.div [
             prop.classes [ "content" ]
             prop.children [
                 Html.h1 "Content"
-                addArtcleButton
+                btnAddArticle
                 state.Articles
                 |> Array.map displayArticleName
                 |> React.fragment
@@ -108,9 +111,7 @@ module Content =
         
 [<RequireQualifiedAccess>]
 module Application =
-    type ApplicationState = {
-        ArticleState: ArticleState
-    }
+    type ApplicationState = { ArticleState: ArticleState }
     
     type Msg =
         | SelectArticle of ArticleId
@@ -118,9 +119,7 @@ module Application =
         | AddArticle
     
     let init articles =
-        {
-            ArticleState = { Articles = articles; SelectedArticleId = None }
-        },
+        { ArticleState = { Articles = articles; SelectedArticleId = None } },
         Cmd.none
     
     let update msg (state: ApplicationState) =
@@ -134,19 +133,18 @@ module Application =
             Cmd.none
             
         | AddArticle ->
-            let newArticleId =
+            let newArticle =
                 state.ArticleState.Articles
-                |> Array.map ( fun article -> article.Id)
+                |> Array.map (fun article -> article.Id)
                 |> Array.max
                 |> fun max -> max + 1
+                |> fun newArticleId -> newArticleId |> Article.addDummyArticle
             
-            let newArticle = newArticleId |> Article.addDummyArticle
             
             { state with
-               ArticleState = { state.ArticleState
-                                with Articles =
-                                        state.ArticleState.Articles
-                                        |> Array.append [| newArticle |] } },
+               ArticleState = {
+                state.ArticleState with
+                    Articles = state.ArticleState.Articles |> Array.append [| newArticle |] } },
             Cmd.none
     
     [<ReactComponent>]
@@ -173,11 +171,7 @@ module Application =
                     Html.h1 "Parent child composition demo"
                     Html.p [ prop.text $"Selected article id: {state.ArticleState.SelectedArticleId}" ]
                 ]
-                sidebar <| [
-                    Menu.Render (state.ArticleState, onArticleSelect, onAddArticle)
-                ]
-                mainContent <| [
-                    Content.Render (state.ArticleState, onArticleSelect, onAddArticle)
-                ]
+                [ Menu.Render (state.ArticleState, onArticleSelect, onAddArticle) ] |> sidebar
+                [ Content.Render (state.ArticleState, onArticleSelect, onAddArticle) ] |> mainContent
             ]
         ]
