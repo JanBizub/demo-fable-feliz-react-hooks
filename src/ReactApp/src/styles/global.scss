@@ -19,7 +19,7 @@
 
 .application-main {
   display: grid;
-  grid-template-areas: "odc-sidebar odc-main";
+  grid-template-areas: "application-sidebar application-content";
   grid-template-columns: 2fr 4fr;
   grid-template-rows: auto 1fr;
 }
@@ -27,11 +27,11 @@
 .application-sidebar {
   margin-top: 1rem;
   padding: 0.5rem;
-  grid-area: odc-sidebar;
+  grid-area: application-sidebar;
 }
 
 .application-content {
   margin-top: 1rem;
   padding: 0.5rem;
-  grid-area: odc-main;
+  grid-area: application-content;
 }

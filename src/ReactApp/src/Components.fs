@@ -24,6 +24,8 @@ module Article =
         { Id = 2; Title = "Article About Guns"; Body = "Guns can remove you." }
         { Id = 3; Title = "Article About Drugs"; Body = "Drugs can move with you." }
     |]
+    
+    let addDummyArticle articleId = { Id = articleId; Title = "Article About Gardening"; Body = "Gardening is about gardening." }
 
 [<RequireQualifiedAccess>]
 module Menu =
@@ -70,14 +72,20 @@ module Content =
     let Render (state: ContentState, onArticleSelect, onAddArticle) =
         // let articles, setArticles = React.useState(articles)
 
-        let displayArticleName (article: Article) =
-            Html.p [
-                prop.classes [ state.SelectedArticleId
-                               |> Option.map (fun selectedArticleId ->
-                                   if selectedArticleId = article.Id then "selected" else "")
-                               |> Option.defaultValue "" ]
-                prop.text article.Title
-                prop.onClick (fun _ -> article.Id |> onArticleSelect)
+        let displayArticleName (article: Article) = React.fragment [
+                Html.h4 [
+                    prop.classes [
+                        state.SelectedArticleId
+                        |> Option.map (fun selectedArticleId ->
+                            if selectedArticleId = article.Id then "selected" else ""
+                        )
+                        |> Option.defaultValue ""
+                    ]
+                    prop.text article.Title
+                    prop.onClick (fun _ -> article.Id |> onArticleSelect)
+                ]
+                Html.p [ prop.text article.Body ]
+                Html.hr []
             ]
             
             
@@ -132,7 +140,7 @@ module Application =
                 |> Array.max
                 |> fun max -> max + 1
             
-            let newArticle = { Id = newArticleId; Title = "Added article"; Body = "Added article" }
+            let newArticle = newArticleId |> Article.addDummyArticle
             
             { state with
                ArticleState = { state.ArticleState
@@ -159,7 +167,7 @@ module Application =
         ]
         
         Html.div [
-            prop.classes [ "application"; "application-main" ]
+            prop.classes [ "application-main" ]
             prop.children [
                 Html.div [
                     Html.h1 "Parent child composition demo"
@@ -171,6 +179,5 @@ module Application =
                 mainContent <| [
                     Content.Render (state.ArticleState, onArticleSelect, onAddArticle)
                 ]
-                
             ]
         ]
