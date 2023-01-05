@@ -1,12 +1,8 @@
 namespace App
 
-open System
-open Fable.Core
 open Feliz
 open Feliz.UseElmish
 open Elmish
-
-// https://beta.reactjs.org/learn/managing-state
 
 type ArticleId = int
 
@@ -34,7 +30,7 @@ module Menu =
     type MenuState = ArticleState
     
     [<ReactComponent>]    
-    let Render (state: MenuState, onArticleSelect, onArticleCreate) =
+    let Render (state: MenuState, onArticleSelect, onAddArticle) =
         // let articles, setArticles = React.useState(articles)
         
         let displayArticleName (article: Article) =
@@ -46,11 +42,18 @@ module Menu =
                 prop.text article.Title
                 prop.onClick (fun _ -> article.Id |> onArticleSelect)
             ]
+            
+        let addArtcleButton = Html.button [
+            prop.text "Add Article"
+            prop.onClick (fun _ -> onAddArticle())
+        ]
         
         Html.div [
             prop.classes [ "menu" ]
             prop.children [
                 Html.h1 "Menu"
+                
+                addArtcleButton
                 
                 state.Articles
                 |> Array.map displayArticleName
@@ -64,7 +67,7 @@ module Content =
     type ContentState = ArticleState
     
     [<ReactComponent>]
-    let Render (state: ContentState, onArticleSelect, onArticleCreate) =
+    let Render (state: ContentState, onArticleSelect, onAddArticle) =
         // let articles, setArticles = React.useState(articles)
 
         let displayArticleName (article: Article) =
@@ -77,18 +80,17 @@ module Content =
                 prop.onClick (fun _ -> article.Id |> onArticleSelect)
             ]
             
+            
         let addArtcleButton = Html.button [
             prop.text "Add Article"
-            prop.onClick (fun _ -> onArticleCreate())
+            prop.onClick (fun _ -> onAddArticle())
         ]
         
         Html.div [
             prop.classes [ "content" ]
             prop.children [
                 Html.h1 "Content"
-                
                 addArtcleButton
-                
                 state.Articles
                 |> Array.map displayArticleName
                 |> React.fragment
@@ -124,30 +126,51 @@ module Application =
             Cmd.none
             
         | AddArticle ->
-            let id =
+            let newArticleId =
                 state.ArticleState.Articles
                 |> Array.map ( fun article -> article.Id)
                 |> Array.max
                 |> fun max -> max + 1
             
-            let newArticle = { Id = id; Title = "Added article"; Body = "Added article" }
+            let newArticle = { Id = newArticleId; Title = "Added article"; Body = "Added article" }
             
             { state with
                ArticleState = { state.ArticleState
-                                with Articles = state.ArticleState.Articles |> Array.append [| newArticle |] } },
+                                with Articles =
+                                        state.ArticleState.Articles
+                                        |> Array.append [| newArticle |] } },
             Cmd.none
     
     [<ReactComponent>]
     let Render () =
-        let (state, dispatch) = React.useElmish(Article.createDummies() |> init, update , [|  |])
+        // https://zaid-ajaj.github.io/Feliz/#/Hooks/UseElmish
+        let state, dispatch = React.useElmish(Article.createDummies() |> init, update , [|  |])
         let onArticleSelect articleId = articleId |> SelectArticle |> dispatch
-        let onArticleCreate () = AddArticle |> dispatch
+        let onAddArticle () = AddArticle |> dispatch
+        
+        let sidebar (children : ReactElement list) = Html.div [
+            prop.classes [ "application-sidebar" ]
+            prop.children children
+        ]
+        
+        let mainContent  (children : ReactElement list) = Html.div [
+            prop.classes [ "application-content" ]
+            prop.children children
+        ]
         
         Html.div [
-            prop.classes [ "application" ]
+            prop.classes [ "application"; "application-main" ]
             prop.children [
-                Html.p [ prop.text $"Selected article id: {state.ArticleState.SelectedArticleId}" ]
-                Menu.Render (state.ArticleState, onArticleSelect, onArticleCreate)
-                Content.Render (state.ArticleState, onArticleSelect, onArticleCreate)
+                Html.div [
+                    Html.h1 "Parent child composition demo"
+                    Html.p [ prop.text $"Selected article id: {state.ArticleState.SelectedArticleId}" ]
+                ]
+                sidebar <| [
+                    Menu.Render (state.ArticleState, onArticleSelect, onAddArticle)
+                ]
+                mainContent <| [
+                    Content.Render (state.ArticleState, onArticleSelect, onAddArticle)
+                ]
+                
             ]
         ]
