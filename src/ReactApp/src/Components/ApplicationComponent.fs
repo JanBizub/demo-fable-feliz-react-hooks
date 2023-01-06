@@ -9,8 +9,8 @@ open Domain.Messenger
 open Domain.Comment
 
 type ApplicationState = {
-    ArticleState: ArticleState
-    MessengerState: MessengerState
+    ArticleState: ArticlesComponent.State
+    MessengerState: MessengerComponent.State
     ErrorMessage: string option
     }
 
@@ -104,7 +104,7 @@ let Render () =
         )
     
     let menuComponentView =
-        MenuComponent.Render(
+        ArticlesComponent.RenderMenu(
             state.ArticleState,
             onArticleSelect,
             onAddArticle,
@@ -112,7 +112,7 @@ let Render () =
         )
 
     let contentComponentView =
-        ContentComponent.Render(
+        ArticlesComponent.RenderArticles(
             state.ArticleState,
             onArticleSelect,
             onAddArticle,

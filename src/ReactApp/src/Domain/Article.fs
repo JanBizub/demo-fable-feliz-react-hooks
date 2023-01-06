@@ -22,8 +22,3 @@ module Article =
     let addDummyArticle articleId =
         { Id = articleId; Title = "Article About Gardening"; Body = "Gardening is about gardening."; Comments = [||] }
 
-type ArticleState = {
-    SelectedArticleId : ArticleId option
-    Articles: Article array
-    }
-

@@ -9,8 +9,7 @@
         <Compile Include="Domain\Messenger.fs" />
         <Compile Include="Components\MessengerComponent.fs" />
         <Compile Include="Components\CommentComponent.fs" />
-        <Compile Include="Components\ContentComponent.fs" />
-        <Compile Include="Components\MenuComponent.fs" />
+        <Compile Include="Components\ArticlesComponent.fs" />
         <Compile Include="Components\ApplicationComponent.fs" />
         <Compile Include="Router.fs" />
         <Compile Include="Main.fs" />

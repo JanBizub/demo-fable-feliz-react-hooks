@@ -19,7 +19,4 @@ module Message =
     let createDummy messageId =
         { Id = messageId; From = "Gopnik"; Body = "You have been gopstopped." }
         
-type MessengerState = {
-    SelectedMessageId : MessageId option
-    Messages: Message array
-    }     
+  
