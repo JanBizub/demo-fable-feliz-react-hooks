@@ -54,7 +54,6 @@ let private update msg (state: ApplicationState) =
             )
             |> Option.defaultValue
                 { state with ErrorMessage = Some "Unable to add comment to article. Target Article has not been found."}
-        
         updatedState,
         Cmd.none
         
@@ -85,7 +84,9 @@ let Render () =
                 Html.h1 "Parent child composition demo"
                 Html.p [ prop.text $"Selected article id: {state.ArticleState.SelectedArticleId}" ]
             ]
-            [ MenuComponent.Render (state.ArticleState, onArticleSelect, onAddArticle) ] |> sidebar
-            [ ContentComponent.Render (state.ArticleState, onArticleSelect, onAddArticle, onAddComment) ] |> mainContent
+            [ MenuComponent.Render (state.ArticleState, onArticleSelect, onAddArticle, onAddComment) ]
+            |> sidebar
+            [ ContentComponent.Render (state.ArticleState, onArticleSelect, onAddArticle, onAddComment) ]
+            |> mainContent
         ]
     ]

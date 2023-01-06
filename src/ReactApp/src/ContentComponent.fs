@@ -1,15 +1,17 @@
 ﻿[<RequireQualifiedAccess>]
-module MenuComponent 
+module MenuComponent
+open System
 open Feliz
 open Domain
 
 type MenuState = ArticleState
 
 [<ReactComponent>]    
-let Render (state: MenuState, onArticleSelect, onAddArticle) =
+let Render (state: MenuState, onArticleSelect, onAddArticle, onAddComment) =
     // let articles, setArticles = React.useState(articles)
     
     let displayArticleName (article: Article) =
+        [
         Html.p [
             prop.classes [
                 state.SelectedArticleId
@@ -19,6 +21,11 @@ let Render (state: MenuState, onArticleSelect, onAddArticle) =
             prop.text $"{article.Title} - {article.Comments.Length} comments"
             prop.onClick (fun _ -> article.Id |> onArticleSelect)
         ]
+        Html.button [
+            prop.text "Add Comment"
+            prop.onClick (fun _ -> onAddComment article.Id (Guid.NewGuid() |> Comment.createDummy))
+        ]
+        ] |> React.fragment
         
     let btnAddArticle = Html.button [
         prop.text "Add Article"
