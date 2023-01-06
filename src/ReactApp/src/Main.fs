@@ -12,8 +12,7 @@ importSideEffects "./styles/global.scss"
 // Windows PowerShell-
 // $env:NODE_OPTIONS = "--openssl-legacy-provider"
 
-
-// todo: what is the difference between ReactDOM.createRoot and RectDOM.render
 ReactDOM.createRoot(document.getElementById "feliz-app")
-|> fun reactRoot -> Router.Apply()
-                    |> reactRoot.render 
+|> fun reactRoot ->
+    Router.Apply()
+    |> reactRoot.render

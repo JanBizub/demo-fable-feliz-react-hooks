@@ -1,7 +1,6 @@
 ﻿[<RequireQualifiedAccess>]
 module ContentComponent
 open System
-open Browser
 open Feliz
 open Domain.Article
 open Domain.Comment
@@ -28,7 +27,7 @@ let Render (state: ContentState, onArticleSelect, onAddArticle, onAddComment) =
             Html.p [ prop.text article.Body ]
             
             match article.Comments with
-            | [||] ->
+            | [|  |] ->
                 Html.button [
                     prop.text "Add Comment"
                     prop.onClick (fun _ -> onAddComment article.Id (Guid.NewGuid() |> Comment.createDummy))

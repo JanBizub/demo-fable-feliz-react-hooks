@@ -38,7 +38,6 @@ let private update msg (state: ApplicationState) =
         
     | AddArticle ->
         let newArticle = Guid.NewGuid() |> Article.addDummyArticle
-        
         { state with
            ArticleState = {
             state.ArticleState with

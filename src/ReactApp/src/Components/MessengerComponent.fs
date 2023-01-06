@@ -3,7 +3,6 @@ module MessengerComponent
 
 open System
 open Feliz
-open Domain
 open Elmish
 open Domain.Messenger
 
