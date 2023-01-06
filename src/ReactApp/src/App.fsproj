@@ -5,9 +5,10 @@
     <ItemGroup>
         <None Include="index.html" />
         <Compile Include="Domain.fs" />
+        <Compile Include="CommentComponent.fs" />
         <Compile Include="MenuComponent.fs" />
-        <Compile Include="Content.fs" />
-        <Compile Include="Application.fs" />
+        <Compile Include="ContentComponent.fs" />
+        <Compile Include="ApplicationComponent.fs" />
         <Compile Include="Router.fs" />
         <Compile Include="Main.fs" />
     </ItemGroup>

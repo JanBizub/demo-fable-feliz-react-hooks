@@ -1,5 +1,5 @@
 ﻿[<RequireQualifiedAccess>]
-module Application
+module ApplicationComponent
 open System
 open Elmish
 open Feliz
@@ -29,7 +29,6 @@ let private update msg (state: ApplicationState) =
         
     | AddArticle ->
         let newArticle = Guid.NewGuid() |> Article.addDummyArticle
-        
         
         { state with
            ArticleState = {
@@ -61,7 +60,7 @@ let Render () =
                 Html.h1 "Parent child composition demo"
                 Html.p [ prop.text $"Selected article id: {state.ArticleState.SelectedArticleId}" ]
             ]
-            [ Menu.Render (state.ArticleState, onArticleSelect, onAddArticle) ] |> sidebar
-            [ Content.Render (state.ArticleState, onArticleSelect, onAddArticle) ] |> mainContent
+            [ MenuComponent.Render (state.ArticleState, onArticleSelect, onAddArticle) ] |> sidebar
+            [ ContentComponent.Render (state.ArticleState, onArticleSelect, onAddArticle) ] |> mainContent
         ]
     ]

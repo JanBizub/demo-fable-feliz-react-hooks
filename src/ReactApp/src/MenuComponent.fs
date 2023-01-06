@@ -1,5 +1,5 @@
 ﻿[<RequireQualifiedAccess>]
-module Content
+module ContentComponent
 open Feliz
 open Domain
 type ContentState = ArticleState
@@ -22,6 +22,16 @@ let Render (state: ContentState, onArticleSelect, onAddArticle) =
                 prop.onClick (fun _ -> article.Id |> onArticleSelect)
             ]
             Html.p [ prop.text article.Body ]
+            
+            match article.Comments with
+            | [||] -> Html.button [ prop.text "Add Comment" ]
+            | comments ->
+                [
+                    Html.p [ prop.text $"Article has: {comments.Length} comments." ]
+                    Html.button [ prop.text "Open Comments" ]
+                ]
+                |> React.fragment
+                
             Html.hr []
         ]
         

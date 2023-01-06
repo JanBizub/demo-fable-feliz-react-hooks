@@ -11,7 +11,7 @@ let Apply() =
         router.onUrlChanged updateUrl
         router.children [
             match currentUrl with
-            | [ ] -> Application.Render()
+            | [ ] -> ApplicationComponent.Render()
             | [ "test" ] -> Html.h1 "test"
             | [ "users"; Route.Int userId ] -> Html.h1 (sprintf "User ID %d" userId)
             | otherwise -> Html.h1 "Not found"

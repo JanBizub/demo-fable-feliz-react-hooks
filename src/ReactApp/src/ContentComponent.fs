@@ -1,5 +1,5 @@
 ﻿[<RequireQualifiedAccess>]
-module Menu 
+module MenuComponent 
 open Feliz
 open Domain
 
@@ -16,7 +16,7 @@ let Render (state: MenuState, onArticleSelect, onAddArticle) =
                 |> Option.map (fun selectedArticleId -> if selectedArticleId = article.Id then "selected" else "")
                 |> Option.defaultValue ""
             ]
-            prop.text article.Title
+            prop.text $"{article.Title} - {article.Comments.Length} comments"
             prop.onClick (fun _ -> article.Id |> onArticleSelect)
         ]
         
