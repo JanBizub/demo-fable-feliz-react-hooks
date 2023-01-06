@@ -3,6 +3,7 @@ module Main
 open Feliz
 open Browser.Dom
 open Fable.Core.JsInterop
+open Feliz.Router
 
 importSideEffects "./styles/global.scss"
 
@@ -14,5 +15,5 @@ importSideEffects "./styles/global.scss"
 
 // todo: what is the difference between ReactDOM.createRoot and RectDOM.render
 ReactDOM.createRoot(document.getElementById "feliz-app")
-|> fun reactRoot -> Application.Render()
+|> fun reactRoot -> Router.Apply()
                     |> reactRoot.render 

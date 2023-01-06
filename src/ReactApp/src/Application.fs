@@ -12,11 +12,11 @@ type Msg =
     | DeselectArticle
     | AddArticle
 
-let init articles =
+let private init articles =
     { ArticleState = { Articles = articles; SelectedArticleId = None } },
     Cmd.none
 
-let update msg (state: ApplicationState) =
+let private update msg (state: ApplicationState) =
     match msg with
     | SelectArticle articleId ->
         { state with ArticleState = { state.ArticleState with SelectedArticleId = Some articleId } },
