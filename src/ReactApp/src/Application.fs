@@ -1,5 +1,6 @@
 ﻿[<RequireQualifiedAccess>]
 module Application
+open System
 open Elmish
 open Feliz
 open Feliz.UseElmish
@@ -8,7 +9,7 @@ open Domain
 type ApplicationState = { ArticleState: ArticleState }
 
 type Msg =
-    | SelectArticle of ArticleId
+    | SelectArticle of Guid
     | DeselectArticle
     | AddArticle
 
@@ -27,12 +28,7 @@ let private update msg (state: ApplicationState) =
         Cmd.none
         
     | AddArticle ->
-        let newArticle =
-            state.ArticleState.Articles
-            |> Array.map (fun article -> article.Id)
-            |> Array.max
-            |> fun max -> max + 1
-            |> fun newArticleId -> newArticleId |> Article.addDummyArticle
+        let newArticle = Guid.NewGuid() |> Article.addDummyArticle
         
         
         { state with
