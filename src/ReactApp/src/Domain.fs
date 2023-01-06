@@ -2,8 +2,9 @@ namespace Domain
 
 open System
 
+type CommentId = Guid
 type Comment = {
-   Id: Guid
+   Id: CommentId
    Body: string
    }
 
@@ -18,8 +19,9 @@ module Comment =
     let createDummy commentId =
         { Id = commentId; Body = "Created Comment Body" }
 
+type ArticleId = Guid
 type Article = {
-    Id    : Guid
+    Id    : ArticleId
     Title : string
     Body  : string
     Comments: Comment array
