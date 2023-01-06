@@ -1,8 +1,11 @@
 ﻿[<RequireQualifiedAccess>]
 module ContentComponent
 open System
+open Browser
 open Feliz
-open Domain
+open Domain.Article
+open Domain.Comment
+
 type ContentState = ArticleState
 
 [<ReactComponent>]

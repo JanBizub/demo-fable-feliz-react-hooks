@@ -1,7 +1,7 @@
 ﻿[<RequireQualifiedAccess>]
 module CommentComponent
 open Feliz
-open Domain
+open Domain.Comment
 
 [<ReactComponent>]
 let Render () =

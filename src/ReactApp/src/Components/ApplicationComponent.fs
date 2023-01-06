@@ -4,7 +4,9 @@ open System
 open Elmish
 open Feliz
 open Feliz.UseElmish
-open Domain
+open Domain.Article
+open Domain.Messenger
+open Domain.Comment
 
 type ApplicationState = {
     ArticleState: ArticleState

@@ -2,7 +2,8 @@
 module MenuComponent
 open System
 open Feliz
-open Domain
+open Domain.Article
+open Domain.Comment
 
 type MenuState = ArticleState
 
