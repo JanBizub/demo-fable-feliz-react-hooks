@@ -1,14 +1,13 @@
 ﻿[<RequireQualifiedAccess>]
 module ContentComponent
+
 open System
 open Feliz
 open Domain.Article
 open Domain.Comment
 
-type ContentState = ArticleState
-
 [<ReactComponent>]
-let Render (state: ContentState, onArticleSelect, onAddArticle, onAddComment) =
+let Render (state: ArticleState, onArticleSelect, onAddArticle, onAddComment) =
     // let articles, setArticles = React.useState(articles)
 
     let displayArticleName (article: Article) =

@@ -19,6 +19,8 @@ type Msg =
     | DeselectArticle
     | AddArticle
     | AddComment of ArticleId * Comment
+    
+type MessengerMsg = MessengerComponent.MessengerMsg
 
 let private init articles =
     { ArticleState = { Articles = articles; SelectedArticleId = None }
@@ -74,9 +76,9 @@ let Render () =
     // lets have two useElmishes :D
     let messengerState, messengerDispatch =
         React.useElmish((state.MessengerState,Cmd.none), MessengerComponent.messengerUpdate, [|  |])
-    let onMessagesReceive () = MessengerComponent.MessengerMsg.ReceiveMessages |> messengerDispatch
-    let onMessageAdd () = MessengerComponent.MessengerMsg.AddMessage |> messengerDispatch
-    let onMessagesRemove () = MessengerComponent.MessengerMsg.DeleteMessages |> messengerDispatch
+    let onMessagesReceive () = MessengerMsg.ReceiveMessages |> messengerDispatch
+    let onMessageAdd () = MessengerMsg.AddMessage |> messengerDispatch
+    let onMessagesRemove () = MessengerMsg.DeleteMessages |> messengerDispatch
         
     let sidebar (children : ReactElement list) = Html.div [
         prop.classes [ "application-sidebar" ]

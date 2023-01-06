@@ -1,14 +1,13 @@
 ﻿[<RequireQualifiedAccess>]
 module MenuComponent
+
 open System
 open Feliz
 open Domain.Article
 open Domain.Comment
 
-type MenuState = ArticleState
-
 [<ReactComponent>]    
-let Render (state: MenuState, onArticleSelect, onAddArticle, onAddComment) =
+let Render (state: ArticleState, onArticleSelect, onAddArticle, onAddComment) =
     // let articles, setArticles = React.useState(articles)
     
     let displayArticleName (article: Article) =

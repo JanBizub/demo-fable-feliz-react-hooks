@@ -28,12 +28,14 @@ let messengerUpdate msg (state: MessengerState) =
 [<ReactComponent>]
 let Render (state: MessengerState, onMessagesReceive, onMessageAdd, onMessagesRemove) =
     [
+        Html.h1 "Messages"
+        
         Html.button [
-            prop.text "Receive Messages"
+            prop.text "Receive"
             prop.onClick (fun _ -> onMessagesReceive ())
         ]
         Html.button [
-            prop.text "Add Message"
+            prop.text "Add"
             prop.onClick (fun _ -> onMessageAdd ())
         ]
         Html.button [
