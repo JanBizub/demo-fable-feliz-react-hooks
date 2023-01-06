@@ -1,59 +1,41 @@
 ﻿[<RequireQualifiedAccess>]
-module ContentComponent
+module MenuComponent
 open System
 open Feliz
 open Domain
-type ContentState = ArticleState
 
-[<ReactComponent>]
-let Render (state: ContentState, onArticleSelect, onAddArticle, onAddComment) =
+type MenuState = ArticleState
+
+[<ReactComponent>]    
+let Render (state: MenuState, onArticleSelect, onAddArticle, onAddComment) =
     // let articles, setArticles = React.useState(articles)
-
+    
     let displayArticleName (article: Article) =
-        React.fragment [
-            Html.h4 [
-                prop.classes [
-                    state.SelectedArticleId
-                    |> Option.map (fun selectedArticleId ->
-                        if selectedArticleId = article.Id then "selected" else ""
-                    )
-                    |> Option.defaultValue ""
-                ]
-                prop.text article.Title
-                prop.onClick (fun _ -> article.Id |> onArticleSelect)
+        [
+        Html.p [
+            prop.classes [
+                state.SelectedArticleId
+                |> Option.map (fun selectedArticleId -> if selectedArticleId = article.Id then "selected" else "")
+                |> Option.defaultValue ""
             ]
-            Html.p [ prop.text article.Body ]
-            
-            match article.Comments with
-            | [||] ->
-                Html.button [
-                    prop.text "Add Comment"
-                    prop.onClick (fun _ -> onAddComment article.Id (Guid.NewGuid() |> Comment.createDummy))
-                ]
-            | comments ->
-                [
-                    Html.p [ prop.text $"Article has: {comments.Length} comments." ]
-                    Html.button [ prop.text "Open Comments" ]
-                    Html.button [
-                        prop.text "Add Comment"
-                        prop.onClick (fun _ -> onAddComment article.Id (Guid.NewGuid() |> Comment.createDummy))
-                    ]
-                ]
-                |> React.fragment
-                
-            Html.hr []
+            prop.text $"{article.Title} - {article.Comments.Length} comments"
+            prop.onClick (fun _ -> article.Id |> onArticleSelect)
         ]
-        
-    let btnAddArticle =
         Html.button [
-            prop.text "Add Article"
-            prop.onClick (fun _ -> onAddArticle())
+            prop.text "Add Comment"
+            prop.onClick (fun _ -> onAddComment article.Id (Guid.NewGuid() |> Comment.createDummy))
         ]
+        ] |> React.fragment
+        
+    let btnAddArticle = Html.button [
+        prop.text "Add Article"
+        prop.onClick (fun _ -> onAddArticle())
+    ]
     
     Html.div [
-        prop.classes [ "content" ]
+        prop.classes [ "menu" ]
         prop.children [
-            Html.h1 "Content"
+            Html.h1 "Menu"
             btnAddArticle
             state.Articles
             |> Array.map displayArticleName

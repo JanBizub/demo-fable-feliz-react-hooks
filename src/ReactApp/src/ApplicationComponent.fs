@@ -8,8 +8,9 @@ open Domain
 
 type ApplicationState = {
     ArticleState: ArticleState
+    MessengerState: MessengerState
     ErrorMessage: string option
-}
+    }
 
 type Msg =
     | SelectArticle of Guid
@@ -18,7 +19,9 @@ type Msg =
     | AddComment of ArticleId * Comment
 
 let private init articles =
-    { ArticleState = { Articles = articles; SelectedArticleId = None }; ErrorMessage = None },
+    { ArticleState = { Articles = articles; SelectedArticleId = None }
+      MessengerState = { SelectedMessageId = None; Messages = [||] }
+      ErrorMessage = None },
     Cmd.none
 
 let private update msg (state: ApplicationState) =
@@ -61,12 +64,19 @@ let private update msg (state: ApplicationState) =
 [<ReactComponent>]
 let Render () =
     // https://zaid-ajaj.github.io/Feliz/#/Hooks/UseElmish
-    // todo: how about have 2 useElmish hooks and separate update functions? :-)
-    let state, dispatch = React.useElmish(Article.createDummies() |> init, update , [|  |])
+    let state, dispatch =
+        React.useElmish(Article.createDummies() |> init, update, [|  |])
     let onArticleSelect articleId = articleId |> SelectArticle |> dispatch
     let onAddArticle () = AddArticle |> dispatch
     let onAddComment articleId commentId = (articleId, commentId) |> AddComment |> dispatch
-    
+
+    // lets have two useElmishes :D
+    let messengerState, messengerDispatch =
+        React.useElmish((state.MessengerState,Cmd.none), MessengerComponent.messengerUpdate, [|  |])
+    let onMessagesReceive () = MessengerComponent.MessengerMsg.ReceiveMessages |> messengerDispatch
+    let onMessageAdd () = MessengerComponent.MessengerMsg.AddMessage |> messengerDispatch
+    let onMessagesRemove () = MessengerComponent.MessengerMsg.DeleteMessages |> messengerDispatch
+        
     let sidebar (children : ReactElement list) = Html.div [
         prop.classes [ "application-sidebar" ]
         prop.children children
@@ -77,16 +87,61 @@ let Render () =
         prop.children children
     ]
     
+    let applicationMessenger (children : ReactElement list) = Html.div [
+        prop.classes [ "application-messenger" ]
+        prop.children children
+    ]
+    
+    let messengerComponentView =
+        MessengerComponent.Render(
+            messengerState,
+            onMessagesReceive,
+            onMessageAdd,
+            onMessagesRemove
+        )
+    
+    let menuComponentView =
+        MenuComponent.Render(
+            state.ArticleState,
+            onArticleSelect,
+            onAddArticle,
+            onAddComment
+        )
+
+    let contentComponentView =
+        ContentComponent.Render(
+            state.ArticleState,
+            onArticleSelect,
+            onAddArticle,
+            onAddComment
+        )
+        
     Html.div [
         prop.classes [ "application-main" ]
         prop.children [
-            Html.div [
-                Html.h1 "Parent child composition demo"
-                Html.p [ prop.text $"Selected article id: {state.ArticleState.SelectedArticleId}" ]
-            ]
-            [ MenuComponent.Render (state.ArticleState, onArticleSelect, onAddArticle, onAddComment) ]
-            |> sidebar
-            [ ContentComponent.Render (state.ArticleState, onArticleSelect, onAddArticle, onAddComment) ]
-            |> mainContent
+            [ menuComponentView ] |> sidebar
+            [ contentComponentView ] |> mainContent
+            [ messengerComponentView ] |> applicationMessenger
         ]
     ]
+    |> fun appContent ->
+        Html.div [
+            prop.children [
+                Html.div [
+                    prop.classes [ "application-header" ]
+                    prop.children [
+                        Html.h1 "Parent child composition demo using react hooks"
+                        let totalComments =
+                            state.ArticleState.Articles
+                            |> Array.map (fun article -> article.Comments.Length)
+                            |> Array.reduce (+)
+                               
+                        Html.p [ prop.text
+                                   $"Selected article id: {state.ArticleState.SelectedArticleId}.
+                                     | Received Messages count: {messengerState.Messages.Length}.
+                                     | Total comments to articles: {totalComments}." ]
+                    ]
+                ]
+                appContent
+            ]
+        ]

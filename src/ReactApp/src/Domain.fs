@@ -2,6 +2,24 @@ namespace Domain
 
 open System
 
+type MessageId = Guid
+type Message = {
+   Id: MessageId
+   From: string
+   Body: string
+   }
+
+[<RequireQualifiedAccess>]
+module Message =
+    let createDummies () = [|
+        { Id = Guid.NewGuid(); From = "Krishnu"; Body = "Hare Hare" }
+        { Id = Guid.NewGuid(); From = "Shiva"; Body = "Now I am become Death, the destroyer of worlds" }
+    |]
+    
+    let createDummy messageId =
+        { Id = messageId; From = "Gopnik"; Body = "You have been gopstopped." }
+        
+
 type CommentId = Guid
 type Comment = {
    Id: CommentId
@@ -39,8 +57,12 @@ module Article =
         { Id = articleId; Title = "Article About Gardening"; Body = "Gardening is about gardening."; Comments = [||] }
 
 type ArticleState = {
-    SelectedArticleId : Guid option
+    SelectedArticleId : ArticleId option
     Articles: Article array
     }
-        
+
+type MessengerState = {
+    SelectedMessageId : MessageId option
+    Messages: Message array
+    }        
         
